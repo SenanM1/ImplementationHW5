@@ -15,6 +15,7 @@ public class BloomFilter<E> {
     public BloomFilter(DataInput input) throws IOException {
         this(input.readInt());
         // TODO
+        input.readFully(this.bits);
     }
 
     public BloomFilter(final int numBytes) {
@@ -33,6 +34,8 @@ public class BloomFilter<E> {
      */
     public void close(DataOutput output) throws IOException {
         // TODO
+        output.writeInt(bits.length / Byte.SIZE); // Writing the number of bytes
+        output.write(bits); // Writing the serialized bit vector
     }
 
     /**
@@ -40,6 +43,11 @@ public class BloomFilter<E> {
      */
     public void add(E element) {
         // TODO:
+        int hash = element.hashCode();
+        for (Function<Integer, Integer> hashFunction : hf) {
+            int index = hashFunction.apply(hash); // Calculating the index in the bit array
+            bits[index / Byte.SIZE] |= 1 << (index % Byte.SIZE); // Seting the corresponding bit
+        }
     }
 
     /**
@@ -47,7 +55,14 @@ public class BloomFilter<E> {
      */
     public boolean containsMaybe(E element) {
         // TODO
-        return false;
+        int hash = element.hashCode();
+        for (Function<Integer, Integer> hashFunction : hf) {
+            int index = hashFunction.apply(hash); // Calculate index in the bit array
+            if ((bits[index / Byte.SIZE] & (1 << (index % Byte.SIZE))) == 0) {
+                return false; // If any bit is not set, the element is definitely not present
+            }
+        }
+        return true; // All bits are set, so the element may be present
     }
 
     /**
@@ -55,5 +70,6 @@ public class BloomFilter<E> {
      */
     public void reset() {
         // TODO
+        Arrays.fill(bits, (byte) 0); // Clearing all bits in the bit vector
     }
 }
