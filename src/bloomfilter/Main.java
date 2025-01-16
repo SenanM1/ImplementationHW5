@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        int numInserts = 16;
+        int numInserts = 10_000;
 
         Random rng = new Random();
 

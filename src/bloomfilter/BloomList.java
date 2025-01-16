@@ -20,39 +20,62 @@ public class BloomList<E> extends LinkedList<E> {
      */
     public void resetBloomFilter() {
         // TODO
+        bf.reset();
+        for (E element : this) {
+            bf.add(element); // Reinserting all current elements into the BloomFilter
+        }
     }
 
     @Override
     public boolean add(E e) {
         // TODO
-        return true;
+        boolean added = super.add(e); // Adding element to the list
+        if (added) {
+            bf.add(e); // Adding element to the BloomFilter
+        }
+        return added;
     }
 
     @Override
     public void add(int index, E element) {
         // TODO
+        super.add(index, element); // Adding element at the specified index
+        bf.add(element); // Adding element to the BloomFilter
     }
 
     @Override
     public E set(int i, E e) {
         // TODO
-        return null;
+        E replaced = super.set(i, e); // Replacing element at index i
+        bf.add(e); // Adding the new element to the BloomFilter
+        resetBloomFilter(); // Rebuilding the BloomFilter to handle possible changes
+        return replaced;
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         // TODO
-        return true;
+        boolean added = super.addAll(index, c); // Adding all elements starting at the specified index
+        if (added) {
+            for (E element : c) {
+                bf.add(element); // Adding each element to the BloomFilter
+            }
+        }
+        return added;
     }
 
     @Override
     public boolean contains(Object e) {
         // TODO
-        return false;
+        @SuppressWarnings("unchecked")
+        E element = (E) e;
+        return bf.containsMaybe(element) && super.contains(e); // Checking BloomFilter first, then list
     }
 
     @Override
     public void clear() {
         // TODO
+        super.clear(); // Clearing the list
+        bf.reset(); // Resetting the BloomFilter
     }
 }
