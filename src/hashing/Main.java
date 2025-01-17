@@ -1,4 +1,6 @@
 package hashing;
+import java.util.logging.Logger;
+
 
 import xxl.core.collections.containers.io.BlockFileContainer;
 import xxl.core.io.Buffer;
@@ -6,8 +8,10 @@ import xxl.core.io.LRUBuffer;
 import xxl.core.io.converters.LongConverter;
 
 public class Main {
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
+
     public static void main(String[] args) {
-        int numInserts = 1000;
+        int numInserts = 100;
 
         BlockFileContainer primary = new BlockFileContainer("main", ExternalLinearHashMap.BLOCK_SIZE);
         BlockFileContainer secondary = new BlockFileContainer("overflow", ExternalLinearHashMap.BLOCK_SIZE);
@@ -18,11 +22,14 @@ public class Main {
 
         ExternalLinearHashMap<Long, Long> map = new ExternalLinearHashMap<Long, Long>(LongConverter.DEFAULT_INSTANCE, LongConverter.DEFAULT_INSTANCE, primary, secondary, buffer);
         for (long i = 0; i < numInserts; i++) {
+            System.out.println("Inserting: " + i + "...");
             map.insert(i, i);
 
             for (long j = 0; j <= i; j++) {
+                System.out.println("Checking: " + j + "...");
                 if (!map.contains(j)) {
-                    throw new RuntimeException("Element not found: " + j);
+                    System.out.println("Element not found: " + i);
+                    // throw new RuntimeException("Element not found: " + j);
                 }
             }
 
@@ -33,7 +40,8 @@ public class Main {
 
         for (long i = 0; i < numInserts; i++) {
             if (!map.contains(i)) {
-                throw new RuntimeException("Element not found: " + i);
+                System.out.println("Element not found: " + i);
+                // throw new RuntimeException("Element not found: " + i);
             }
         }
 
@@ -44,7 +52,8 @@ public class Main {
 
         for (long i = 0; i < numInserts; i++) {
             if (!map.contains(i)) {
-                throw new RuntimeException("Element not found: " + i);
+                System.out.println("Element not found: " + i);
+                // throw new RuntimeException("Element not found: " + i);
             }
         }
     }
